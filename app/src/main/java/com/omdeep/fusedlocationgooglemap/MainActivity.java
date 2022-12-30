@@ -3,33 +3,34 @@ package com.omdeep.fusedlocationgooglemap;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
-
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-
 import com.google.android.gms.tasks.Task;
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     //TODO:Initialize variable
     SupportMapFragment supportMapFragment;
     FusedLocationProviderClient client;
     private GoogleMap mMap;
+    private List<Address> address;
 //    private Menu menu;
 
     @Override
@@ -80,7 +81,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                    onCreateOptionsMenu(menu);
                     googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                     //TODO: Create marker options
-                    MarkerOptions options = new MarkerOptions().position(latLng).title("You are here");
+
+                    Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+                    try {
+                        address = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),3);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    MarkerOptions options = new MarkerOptions().position(latLng).title(address.get(0).getSubLocality()+", "+address.get(0).getLocality()+", "+address.get(0).getAdminArea()+", "+ address.get(0).getCountryName());
 
                     //TODO: Zoom Map
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
